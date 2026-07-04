@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SubManager | Tableau de bord premium</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <h2>SubManager</h2>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-tab="dashboard">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Actions & Stats</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="clients">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Clients & Contacts</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="families">
+                    <i class="fa-solid fa-people-roof"></i>
+                    <span>Familles & Groupes</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="history">
+                    <i class="fa-solid fa-history"></i>
+                    <span>Historique</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <p>Version 1.0 (Prod)</p>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-bar">
+                <div class="page-title">
+                    <h1 id="tab-title">Actions du jour</h1>
+                    <p id="tab-subtitle">Automatisation du suivi des abonnements Spotify & Apple</p>
+                </div>
+                <div class="top-bar-actions">
+                    <button class="btn btn-primary" onclick="openModal('modal-add-subscription')">
+                        <i class="fa-solid fa-plus"></i> Nouvel Abonnement
+                    </button>
+                    <button class="btn btn-secondary" onclick="openModal('modal-add-client')">
+                        <i class="fa-solid fa-user-plus"></i> Nouveau Client
+                    </button>
+                </div>
+            </header>
+
+            <!-- TAB: DASHBOARD -->
+            <section id="tab-dashboard" class="tab-content active">
+                <!-- Stats Indicators -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon client-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Clients Totaux</span>
+                            <span class="stat-value" id="stat-total-clients">-</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon active-icon">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Abonnements Actifs</span>
+                            <span class="stat-value" id="stat-active-subs">-</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning-icon">
+                            <i class="fa-solid fa-bell"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Relances (J-2 / J-1)</span>
+                            <span class="stat-value text-warning" id="stat-pending-reminders">-</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon spot-spotify-icon">
+                            <i class="fa-brands fa-spotify"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Places Libres Spotify</span>
+                            <span class="stat-value text-spotify" id="stat-spotify-free">-</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon spot-apple-icon">
+                            <i class="fa-brands fa-apple"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Places Libres Apple</span>
+                            <span class="stat-value text-apple" id="stat-apple-free">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Dashboard Split -->
+                <div class="dashboard-split">
+                    <!-- Left: Day Actions List -->
+                    <div class="split-left glass-card">
+                        <div class="card-header">
+                            <div class="header-title">
+                                <i class="fa-solid fa-list-check text-indigo"></i>
+                                <h3>Actions requises aujourd'hui</h3>
+                            </div>
+                            <span class="badge badge-indigo" id="action-count">0 action</span>
+                        </div>
+                        <div class="actions-list" id="actions-container">
+                            <!-- Actions dynamically loaded -->
+                            <div class="loading-state">
+                                <i class="fa-solid fa-circle-notch fa-spin"></i>
+                                <p>Chargement des actions...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Quick Families Overview -->
+                    <div class="split-right glass-card">
+                        <div class="card-header">
+                            <div class="header-title">
+                                <i class="fa-solid fa-people-roof text-indigo"></i>
+                                <h3>Familles & Places</h3>
+                            </div>
+                            <button class="btn-icon" onclick="openModal('modal-add-family')" title="Ajouter une famille">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="families-mini-list" id="families-container">
+                            <!-- Families dynamically loaded -->
+                            <div class="loading-state">
+                                <i class="fa-solid fa-circle-notch fa-spin"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: CLIENTS -->
+            <section id="tab-clients" class="tab-content">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="search-bar-container">
+                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            <input type="text" id="client-search" placeholder="Rechercher un client par son nom ou numéro...">
+                        </div>
+                        <button class="btn btn-primary" onclick="openModal('modal-add-client')">
+                            <i class="fa-solid fa-user-plus"></i> Ajouter un client
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nom/Pseudo</th>
+                                    <th>Contact (WhatsApp/SMS)</th>
+                                    <th>Statut Client</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clients-table-body">
+                                <!-- Loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: FAMILIES -->
+            <section id="tab-families" class="tab-content">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="header-title">
+                            <i class="fa-solid fa-people-roof text-indigo"></i>
+                            <h3>Gestion des groupes familiaux</h3>
+                        </div>
+                        <button class="btn btn-primary" onclick="openModal('modal-add-family')">
+                            <i class="fa-solid fa-plus"></i> Créer une famille
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nom du Groupe</th>
+                                    <th>Plateforme</th>
+                                    <th>Places Occupées</th>
+                                    <th>Places Max</th>
+                                    <th>État</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="families-table-body">
+                                <!-- Loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: HISTORY / SUBSCRIPTIONS -->
+            <section id="tab-history" class="tab-content">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="header-title">
+                            <i class="fa-solid fa-history text-indigo"></i>
+                            <h3>Historique de tous les abonnements</h3>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th>Groupe</th>
+                                    <th>Plateforme</th>
+                                    <th>Date de début</th>
+                                    <th>Date d'échéance</th>
+                                    <th>Statut Paiement</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subscriptions-table-body">
+                                <!-- Loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL: ADD CLIENT -->
+    <div id="modal-add-client" class="modal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3>Nouveau Client</h3>
+                <button class="close-btn" onclick="closeModal('modal-add-client')">&times;</button>
+            </div>
+            <form id="form-add-client" onsubmit="submitAddClient(event)">
+                <div class="form-group">
+                    <label for="client-nom">Nom ou Pseudo</label>
+                    <input type="text" id="client-nom" required placeholder="Ex: Jean Dupont">
+                </div>
+                <div class="form-group">
+                    <label for="client-contact">Numéro de Contact (WhatsApp / SMS)</label>
+                    <input type="tel" id="client-contact" required placeholder="Ex: +33612345678">
+                    <small>Indiquez le numéro au format international de préférence.</small>
+                </div>
+                <div class="form-group">
+                    <label for="client-statut">Statut initial</label>
+                    <select id="client-statut">
+                        <option value="Actif" selected>Actif</option>
+                        <option value="Inactif">Inactif</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-add-client')">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD FAMILY -->
+    <div id="modal-add-family" class="modal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3>Nouvelle Famille</h3>
+                <button class="close-btn" onclick="closeModal('modal-add-family')">&times;</button>
+            </div>
+            <form id="form-add-family" onsubmit="submitAddFamily(event)">
+                <div class="form-group">
+                    <label for="family-nom">Nom de la Famille</label>
+                    <input type="text" id="family-nom" required placeholder="Ex: Spotify Premium #1">
+                </div>
+                <div class="form-group">
+                    <label for="family-type">Type de Plateforme</label>
+                    <select id="family-type" required>
+                        <option value="Spotify" selected>Spotify</option>
+                        <option value="Apple">Apple Music</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="family-places">Nombre max de places</label>
+                    <input type="number" id="family-places" required min="1" max="10" value="5">
+                    <small>Généralement 5 pour Spotify/Apple.</small>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-add-family')">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD SUBSCRIPTION -->
+    <div id="modal-add-subscription" class="modal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3>Créer un Abonnement</h3>
+                <button class="close-btn" onclick="closeModal('modal-add-subscription')">&times;</button>
+            </div>
+            <form id="form-add-subscription" onsubmit="submitAddSubscription(event)">
+                <div class="form-group">
+                    <label for="sub-client">Client</label>
+                    <select id="sub-client" required>
+                        <option value="" disabled selected>Choisir un client...</option>
+                        <!-- Loaded dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sub-family">Famille (avec places libres)</label>
+                    <select id="sub-family" required>
+                        <option value="" disabled selected>Choisir une famille...</option>
+                        <!-- Loaded dynamically -->
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sub-debut">Date de Début</label>
+                        <input type="date" id="sub-debut" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="sub-fin">Date d'Échéance</label>
+                        <input type="date" id="sub-fin" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="sub-paiement">Statut du Paiement</label>
+                    <select id="sub-paiement" required>
+                        <option value="Payé" selected>Payé</option>
+                        <option value="En attente">En attente</option>
+                        <option value="Expiré">Expiré / Résilié</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-add-subscription')">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Attribuer la place</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom JS -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
